@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'question.dart';
+import 'quiz_brain.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
 
@@ -27,13 +29,20 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Widget> scoreKeeper = [];
-  List<Question> questions = [
-    Question(q: 'You can lead a cow up stairs but not down them.', a: false),
-    Question(q: 'Approximately 1/4 of human bones are in the feet.', a: true),
-    Question(q: 'A slug\s blood is green.', a: true),
-  ];
 
-  int questionIndex = 0;
+  void checkAnswer(bool userAnswer) {
+    bool answer = quizBrain.getAnswer();
+    setState(() {
+      if (answer == userAnswer) {
+        print('user is right');
+        scoreKeeper.add(Icon(Icons.check, color: Colors.green));
+      } else {
+        print('user is wrong');
+        scoreKeeper.add(Icon(Icons.close, color: Colors.red));
+      }
+      quizBrain.nextQuestion();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +56,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                questions[questionIndex].text,
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -70,19 +79,7 @@ class _QuizPageState extends State<QuizPage> {
                   fontSize: 20.0,
                 ),
               ),
-              onPressed: () {
-                //The user picked true.
-                bool answer = questions[questionIndex].answer;
-                if (answer == true) {
-                  print('user is right');
-                } else {
-                  print('user is wrong');
-                }
-                setState(() {
-                  questionIndex++;
-                  scoreKeeper.add(Icon(Icons.check, color: Colors.green));
-                });
-              },
+              onPressed: () => checkAnswer(true),
             ),
           ),
         ),
@@ -98,24 +95,11 @@ class _QuizPageState extends State<QuizPage> {
                   color: Colors.white,
                 ),
               ),
-              onPressed: () {
-                //The user picked false.
-                bool answer = questions[questionIndex].answer;
-                if (answer == false) {
-                  print('user is right');
-                } else {
-                  print('user is wrong');
-                }
-                setState(() {
-                  questionIndex++;
-                  scoreKeeper.add(Icon(Icons.close, color: Colors.red));
-                });
-              },
+              onPressed: () => checkAnswer(false),
             ),
           ),
         ),
         Row(children: scoreKeeper),
-        //TODO: Add a Row here as your score keeper
       ],
     );
   }
